@@ -5,7 +5,12 @@ public, community-facing companion to Minder's plugin ecosystem — it turns you
 into a guided plugin author that scaffolds, validates, and security-reviews a plugin
 against the public [`plugin-sdk`](https://github.com/minderhq/plugin-sdk) and
 [`plugin-template`](https://github.com/minderhq/plugin-template) before you open a PR to
-[`plugins`](https://github.com/minderhq/plugins).
+[`plugins`](https://github.com/minderhq/plugins). The human-readable authoring
+guides this toolkit automates live on the docs site:
+[plugins](https://minderhq.github.io/docs/plugins/) ·
+[authoring](https://minderhq.github.io/docs/plugins/authoring/) ·
+[contract](https://minderhq.github.io/docs/plugins/contract/) ·
+[publishing](https://minderhq.github.io/docs/plugins/publishing/).
 
 > **Naming:** "plugin" refers to a Minder **product** plugin (the thing you build).
 > The Claude Code tooling here is prefixed `minder-` to stay distinct in a session's
