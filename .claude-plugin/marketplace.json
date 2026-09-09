@@ -1,0 +1,20 @@
+{
+  "name": "minderhq-authoring",
+  "owner": {
+    "name": "minderhq",
+    "url": "https://github.com/minderhq"
+  },
+  "metadata": {
+    "description": "Public authoring toolkit for Claude Code — guided creation, validation, and security review of Minder product plugins.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "minder-authoring",
+      "source": "./plugins/minder-authoring",
+      "description": "Community toolkit for authoring Minder product plugins against the public plugin-sdk / plugin-template: scaffold, SDK-contract validation, and protocol + security review agents.",
+      "version": "0.1.0",
+      "author": { "name": "minderhq" }
+    }
+  ]
+}

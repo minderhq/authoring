@@ -1,0 +1,10 @@
+# NEVER commit secrets. This is a PUBLIC repo — no credentials, no internal
+# infrastructure details, and no local filesystem paths. See the README
+# "Public-safety boundary" section before adding any file.
+.env
+.env.*
+*.secret
+
+__pycache__/
+*.pyc
+.DS_Store
