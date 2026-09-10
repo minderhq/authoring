@@ -1,0 +1,8 @@
+{
+  "name": "dev",
+  "version": "0.1.0",
+  "description": "Generic autonomous development operator for Claude Code — work a GitHub issue backlog end-to-end (select → implement → test → review → commit → push → PR → verify → resume), specialised per project by a lightweight dev-policy. Organization-agnostic; MinderHQ is the reference integration, not a hard-coded assumption.",
+  "author": { "name": "minderhq", "url": "https://github.com/minderhq" },
+  "homepage": "https://github.com/minderhq/authoring",
+  "keywords": ["development", "autonomous", "issues", "github", "operator", "workflow", "resume", "policy"]
+}
