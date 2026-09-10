@@ -1,23 +1,23 @@
 ---
-description: Start the MinderHQ development queue — autonomously select and implement ready minderhq issues one at a time, each as a focused PR, without re-pasting the workflow.
+description: Start the MinderHQ development queue — run the generic dev-operator under the MinderHQ policy to autonomously implement ready minderhq issues one at a time as focused PRs.
 ---
 
-Start the MinderHQ development queue. Load the [[dev-queue]] skill and run its loop —
-you already hold the full policy, so don't ask the developer to re-state it between
-issues.
+Start the MinderHQ development queue. This is the MinderHQ entrypoint to the generic
+autonomous development engine: load the [[minder-dev-policy]] skill (MinderHQ's
+specialisation) and run the [[dev-operator]] loop under it — equivalent to
+`/dev:develop --policy minder-dev-policy`. You already hold the full policy, so don't ask
+for confirmation between ordinary issues.
 
-1. **Select** the next appropriate `minderhq` issue from org-wide open issues
-   (metadata-only; skip blocked / claimed / duplicate / not-ready; honour priority,
-   milestones and dependencies).
-2. **Identify** the owning `owner/repo#N` — never assume the current checkout is the
-   target.
-3. **Dispatch** it to the [[issue-implementer]] agent, which implements it end-to-end
-   (plan → implement → test → self-review → commit → push → PR → verify) in that repo
-   and returns a compact result.
-4. **Verify** the PR exists, record `issue → PR`, and continue to the next issue.
+The operator will, per issue: select the next ready `minderhq` issue (MinderHQ's
+Issue-Type + `priority:*`/`component:*`/`status:*` governance; skip blocked / claimed /
+duplicate / triage-only), identify the owning `owner/repo#N` (never assume the current
+checkout), dispatch it to [[dev-implementer]] (plan → implement → test → review → commit
+→ push → PR → verify), and continue. Org-hygiene, ADR discipline, resume, and CI-parity
+validation delegate to the private Minder operator tooling when installed (see
+[[minder-dev-policy]] *Delegation*); otherwise the generic built-ins apply.
 
-Stay inside the `minderhq` org, one issue = one focused PR, and stop only on a genuine
-blocker (see [[dev-queue]] *Stop conditions*) — including when no ready issue remains.
+Requires the `dev` plugin (generic operator) installed. Stop only on a genuine blocker
+(see [[dev-operator]] *Stop conditions*), including when no ready issue remains.
 Optionally narrow the queue with arguments (a repo, label, or milestone):
 
 $ARGUMENTS
