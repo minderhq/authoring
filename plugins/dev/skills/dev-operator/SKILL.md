@@ -84,8 +84,11 @@ blocker). Do not restate that per-issue policy here — it lives in the agent.
 Primary state is **re-derivable from the platform**: open PRs (done / in-flight),
 open issues (the queue), and — where the policy names one — an architecture ledger. On
 top of that, keep an optional lightweight checkpoint the policy may enable
-(`state.mode: file`, default path `.dev/state.json`, committed) so a new session/machine
-resumes without reconstructing history. Minimum fields:
+(`state.mode: file`, default path `.dev/state.json`) so a new session/machine resumes
+without reconstructing history. Persist it **outside any issue's feature branch** — on
+the repo's default branch or a dedicated `dev/state` branch, updated *between* issues and
+never as part of an issue's commit — so an issue's PR never carries state churn
+(preserving one-issue/one-PR isolation). Minimum fields:
 ```jsonc
 {
   "current_issue": "owner/repo#N | null",

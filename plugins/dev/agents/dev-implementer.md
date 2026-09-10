@@ -31,6 +31,13 @@ into a fresh directory or worktree. Read that repo's own instructions first —
 style, test commands). The policy's conventions and the repo's instructions win over any
 habit from another project.
 
+**Precondition — clean tree before any change.** Run `git status` before editing. If the
+tree is dirty, do **not** proceed to fold unrelated changes into this issue: decide
+whether the changes are *this issue's own* in-flight work (a resumed attempt — continue
+only those) or unrelated (stop and report, or work in a fresh worktree). Never sweep
+unrelated modifications into the issue's commit, and never start on a branch that already
+carries another issue's work.
+
 ## 3. Plan the smallest clean change
 Understand acceptance criteria; inspect the existing implementation and relevant code
 paths; read existing tests; check related APIs/contracts, compatibility, and any
