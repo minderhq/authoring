@@ -18,59 +18,124 @@ guides this toolkit automates live on the docs site:
 
 ## What's here
 
-### `minder-authoring` (this marketplace's plugin)
-A skill/command/agent bundle with two capabilities — **plugin authoring** and the
-**MinderHQ development queue**. It does **not** re-copy the SDK docs — it points at the
+This marketplace hosts **two plugins**, cleanly separated: `minder-authoring` (plugin
+authoring + the MinderHQ dev policy) and `dev` (a generic, reusable autonomous
+development operator).
+
+### `minder-authoring`
+A skill/command/agent bundle. It does **not** re-copy the SDK docs — it points at the
 canonical public sources and adds guided authoring on top:
 
 - **Skills** — `authoring-guide` (write a plugin against the SDK contract),
   `authoring-security` (the catalog's security discipline), `authoring-publish`
-  (validate → refresh catalog → PR), and `dev-queue` (the autonomous issue-queue loop).
+  (validate → refresh catalog → PR), and `minder-dev-policy` (the MinderHQ
+  specialisation of the `dev` operator).
 - **Commands** — `/minder-plugin-new` (scaffold), `/minder-plugin-check` (validate +
   lint + tests), `/minder-plugin-publish` (catalog + PR checklist), and
-  `/minder-dev-queue` (start the development queue).
+  `/minder-dev-queue` (start the MinderHQ development queue).
 - **Agents** — `plugin-contract-reviewer` (protocol / SDK-contract / manifest
-  correctness), `plugin-security-reviewer` (SSRF, XML hardening, input-injection,
-  secret handling, no-arbitrary-code), and `issue-implementer` (implements one issue
-  end-to-end in its owning repo).
+  correctness) and `plugin-security-reviewer` (SSRF, XML hardening, input-injection,
+  secret handling, no-arbitrary-code).
 
-## MinderHQ development queue
+### `dev` — the generic development operator
+The autonomous development engine, **organization-agnostic** and installable on its own
+for any GitHub repo/org:
 
-An additional, clearly-separated capability for working through `minderhq` GitHub issues
-autonomously. Start it with **`/minder-dev-queue`** or just *"Start the MinderHQ
-development queue."* — the workflow policy lives in the `dev-queue` skill, so you never
-re-paste a long implementation prompt between issues.
+- **Commands** — `/dev:develop` (start/continue the loop), `/dev:resume` (restore state
+  and continue), `/dev:status` (read-only report).
+- **Skills** — `dev-operator` (the engine: modes, loop, state, selection, recovery,
+  safety), `dev-policy` (the adapter contract — schema + a worked non-MinderHQ example).
+- **Agent** — `dev-implementer` (implements one issue end-to-end in its owning repo,
+  following the active policy's conventions).
 
-- **What it does** — loops `select next ready issue → implement → test → self-review →
-  commit → push → open PR → verify → next`, one issue at a time, each as a focused PR.
-- **Issue selection** — org-wide, metadata-first, and *not* every open issue: it prefers
-  actionable, unblocked, ready, highest-priority, on-roadmap issues and skips blocked,
-  already-claimed, duplicate, or not-ready ones, honouring labels, milestones and
-  dependencies. It never invents issues to keep the loop running.
-- **Per-issue work** — each issue is dispatched to the `issue-implementer` agent, which
-  identifies the **owning** repository (never assuming the current checkout), follows
-  that repo's conventions and tests, self-reviews the full diff, and opens a PR that
-  references the issue. One issue = one focused PR.
-- **Autonomous loop** — no confirmation between normal issues. The orchestrator carries
-  only a one-line-per-issue ledger; the agent does targeted (not repo-wide) inspection,
-  keeping token/context usage low.
-- **When it stops** — only on a genuine blocker: product/design clarification,
-  missing credentials/permissions, an irreversible action needing approval, a blocked
-  external dependency, a security-sensitive decision, contradictory requirements, or
-  when no ready issue remains.
-- **Scope limit** — the `minderhq` org and its repositories only. This is deliberately
-  **not** a generic autonomous coding agent, and it never modifies a repository the
-  current issue doesn't own.
+## The development operator
+
+Work a GitHub issue backlog autonomously without re-pasting a workflow. The engine is
+generic; a small **policy** specialises it per project. Architecture:
+
+```
+Generic Development Operator  (dev plugin: dev-operator + dev-implementer)
+        ↓  reads
+Repository / Organization policy  (dev-policy: a .dev/policy.yml or a policy skill)
+        ↓  supplies
+project rules · GitHub governance · conventions · validation · ADR/architecture source
+```
+
+- **Autonomous loop** — `load state → select next suitable issue → identify owning repo
+  → inspect issue + code + instructions + dependencies → (consult architecture when
+  significant) → implement → test → review → commit → push → open PR → verify → persist
+  state → next`. No confirmation between ordinary issues.
+- **Three modes for efficiency** — **RESUME** (restore git-backed state, continue from
+  the last checkpoint; the default), **EXECUTION** (targeted work on the current issue),
+  **DISCOVERY** (a backlog scan, only when the queue is unknown/exhausted). Not every
+  issue starts with an org-wide scan.
+- **Issue selection** — the engine surfaces priority, labels, issue type, milestones,
+  dependencies, blocked state, readiness, duplicates, and existing work; the **policy**
+  decides how to weigh them. It never blindly takes every open issue and never invents
+  issues.
+- **Repository awareness** — never assumes the current checkout owns an issue: it
+  identifies `owner/repo#N`, verifies identity, reads that repo's instructions, and works
+  in the correct repository. One issue = one focused PR; cross-repo only when required.
+- **State / resume** — lightweight and git-backed. Either a committed `.dev/state.json`
+  checkpoint (`current_issue`, `repository`, `phase`, `completed`, `failures`,
+  `blockers`, `pr`, `next_action`, `last_checkpoint`) or pure re-derivation from open
+  PRs/issues — the policy chooses. No database, no external state service.
+- **Failure & recovery** — records failures, retries only when safe (never endlessly),
+  persists blocked state and skips to another issue, never duplicates commits/PRs, and
+  resumes cleanly after an interrupted session.
+- **Safety** — never fabricates tests/PRs/commits, ignores acceptance criteria, bypasses
+  security controls, exposes secrets, or modifies unrelated repos. Stops for genuine
+  clarification, missing credentials/permissions, or contradictory requirements.
+
+### Use it on any repo (non-MinderHQ example)
+Install the `dev` plugin, drop a policy in your repo, and run `/dev:develop`:
+
+```bash
+claude plugin marketplace add minderhq/authoring
+claude plugin install dev@minderhq-authoring
+```
+```yaml
+# acme/widget/.dev/policy.yml
+organization: acme
+repositories: [acme/widget]
+issue_selection: { ready_labels: [ready], blocked_labels: [blocked], priority: [priority:high, priority:low] }
+branch: "{type}/{issue}-{slug}"
+commit: conventional-commits
+pr: { title: conventional-commits, base: main, reference: "Closes #{issue}" }
+validation: ["npm run lint", "npm test"]
+state: { mode: file, path: .dev/state.json }
+```
+No MinderHQ tooling, ADRs, or infrastructure required — see the `dev-policy` skill for
+the full schema.
+
+### Use it on MinderHQ
+Install both plugins, then start the queue with a single short command:
+
+```bash
+claude plugin install dev@minderhq-authoring
+claude plugin install minder-authoring@minderhq-authoring
+```
+
+Run **`/minder-dev-queue`** (or *"Start the MinderHQ development queue."*). It runs the
+generic operator under `minder-dev-policy`, which maps MinderHQ's **public** governance
+(native Issue Types; `priority:*`/`component:*`/`status:*` labels; Conventional-Commits;
+PR templates) onto the policy schema, and **delegates** org-hygiene, ADR discipline,
+resume, and CI-parity validation to the private Minder operator tooling (`minder-gh`,
+`minder-adr`, `minder-resume`, `minder-dev`) **when it is installed** — reusing those
+systems rather than duplicating them, and falling back to the generic built-ins when it
+is not. Those operator commands are unchanged; nothing here modifies them.
 
 ## Install
 
 ```bash
 claude plugin marketplace add minderhq/authoring
-claude plugin install minder-authoring@minderhq-authoring
+claude plugin install minder-authoring@minderhq-authoring   # plugin authoring
+claude plugin install dev@minderhq-authoring                # the development operator
 ```
 
-Then, from a checkout of your plugin (scaffolded from `plugin-template`), run
-`/minder-plugin-new` to start, or ask Claude to review an existing plugin.
+For authoring, from a checkout of your plugin (scaffolded from `plugin-template`) run
+`/minder-plugin-new`, or ask Claude to review an existing plugin. For development, run
+`/dev:develop` (any repo with a policy) or `/minder-dev-queue` (MinderHQ).
 
 ## The contract in one screen
 

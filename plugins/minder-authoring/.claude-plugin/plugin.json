@@ -1,8 +1,8 @@
 {
   "name": "minder-authoring",
-  "version": "0.1.0",
-  "description": "Community toolkit for authoring Minder product plugins against the public plugin-sdk / plugin-template (scaffold, SDK-contract validation, protocol + security review) plus the MinderHQ development queue — an autonomous, controlled loop that implements ready minderhq issues one at a time.",
+  "version": "0.2.0",
+  "description": "Community toolkit for authoring Minder product plugins against the public plugin-sdk / plugin-template (scaffold, SDK-contract validation, protocol + security review), plus minder-dev-policy — the MinderHQ specialisation of the generic `dev` operator, entered via /minder-dev-queue.",
   "author": { "name": "minderhq", "url": "https://github.com/minderhq" },
   "homepage": "https://github.com/minderhq/authoring",
-  "keywords": ["minder", "plugin", "authoring", "sdk", "community", "review", "security", "issues", "dev-queue", "automation"]
+  "keywords": ["minder", "plugin", "authoring", "sdk", "community", "review", "security", "issues", "dev-policy", "automation"]
 }
