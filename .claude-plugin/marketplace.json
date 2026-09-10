@@ -5,14 +5,21 @@
     "url": "https://github.com/minderhq"
   },
   "metadata": {
-    "description": "Public authoring toolkit for Claude Code — guided creation, validation, and security review of Minder product plugins.",
+    "description": "Public Claude Code toolkit for the Minder ecosystem — the plugin-authoring toolkit plus a generic autonomous development operator (MinderHQ is its reference integration).",
     "version": "0.1.0"
   },
   "plugins": [
     {
       "name": "minder-authoring",
       "source": "./plugins/minder-authoring",
-      "description": "Community toolkit for authoring Minder product plugins against the public plugin-sdk / plugin-template (scaffold, SDK-contract validation, protocol + security review) plus the MinderHQ development queue — an autonomous, controlled loop that implements ready minderhq issues one at a time as focused PRs.",
+      "description": "Community toolkit for authoring Minder product plugins against the public plugin-sdk / plugin-template (scaffold, SDK-contract validation, protocol + security review), plus the MinderHQ dev-operator policy — the minderhq specialisation of the generic `dev` operator (entrypoint /minder-dev-queue).",
+      "version": "0.2.0",
+      "author": { "name": "minderhq" }
+    },
+    {
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "Generic, organization-agnostic autonomous development operator: work a GitHub issue backlog end-to-end (select → implement → test → review → commit → push → PR → verify → resume) via /dev:develop, /dev:resume, /dev:status. Specialised per project by a lightweight dev-policy; reusable for any repo/org.",
       "version": "0.1.0",
       "author": { "name": "minderhq" }
     }
